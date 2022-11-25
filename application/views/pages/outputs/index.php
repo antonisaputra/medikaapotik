@@ -35,7 +35,7 @@
                                         <td class="border-top-0 text-muted px-2 py-4 font-14 text-center"><?= date('d-m-Y H:i:s', strtotime($row->waktu)) ?></td>
                                         <td class="border-top-0 text-center text-muted px-2 py-4">Rp.<?= number_format($row->total_harga, 0, ',', '.') ?>,-</td>
                                         <td class="border-top-0 text-center text-muted px-2 py-4">
-                                            <a href="<?= base_url("inputs/detail/$row->id") ?>" class="btn btn-primary btn-rounded"><i data-feather="shopping-cart"></i>&nbsp;&nbsp;Detail</a>
+                                            <a href="<?= base_url("outputs/detail/$row->id") ?>" class="btn btn-primary btn-rounded"><i data-feather="shopping-cart"></i>&nbsp;&nbsp;Detail</a>
                                         </td>
                                     </tr>
                                 <?php endforeach ?>

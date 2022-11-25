@@ -13,7 +13,7 @@
                         <tr>
                             <td>Nomor pengeluaran</td>
                             <td>:</td>
-                            <td><?= $barang_keluar->id_barang_keluar ?></td>
+                            <td><?= $barang_keluar->id; ?></td>
                         </tr>
                         <tr>
                             <td>NIP Staff</td>
@@ -23,7 +23,7 @@
                         <tr>
                             <td>Nama Staff</td>
                             <td>:</td>
-                            <td><?= $barang_keluar->nama ?></td>
+                            <td><?= $user->nama ?></td>
                         </tr>
                         <tr>
                             <td>Waktu</td>
@@ -41,10 +41,11 @@
                         </thead>
                         <tbody>
                             <?php foreach ($list_barang as $barang) : ?>
+                                <?php $barang2 = $this->db->get_where('barang',['id' => $barang->id_barang])->row();  ?>
                                 <tr>
                                     <td>
-                                        <strong><?= $barang->nama ?></strong> / 
-                                        <small><?= ucfirst(getUnitName($barang->id_satuan)) ?></small>
+                                        <strong><?= $barang2->nama ?></strong> / 
+                                        <small><?= ucfirst(getUnitName($barang2->id_satuan)) ?></small>
                                     </td>
                                     <td class="text-center"><?= $barang->qty ?></td>
                                 </tr>

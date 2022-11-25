@@ -21,6 +21,7 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <?php $total = 0; ?>
                             <?php foreach ($content as $row) : ?>
                                 <tr>
                                     <td>
@@ -47,6 +48,7 @@
                                         </form>
                                     </td>
                                 </tr>
+                                <?php $total = $row->subtotal; ?>
                             <?php endforeach ?>
                         </tbody>
                     </table>
@@ -63,7 +65,7 @@
                             </form>
                         </div>
                         <div class="col-md-4 col-sm-12 mb-2">
-                            <a href="<?= base_url('cartout/checkout') ?>" class="btn btn-success btn-rounded float-right">Checkout <i class="fas fa-angle-right"></i></a>
+                            <a href="<?= base_url('cartout/checkout/').$total ?>" class="btn btn-success btn-rounded float-right">Checkout <i class="fas fa-angle-right"></i></a>
                         </div>
                     </div>
                 </div>

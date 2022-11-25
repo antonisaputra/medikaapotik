@@ -34,7 +34,7 @@ class Cartout extends MY_Controller
         $data['content']            = $this->cartout->select([
             'barang.id AS id_barang', 'barang.nama', 'barang.harga',
             'barang.id_satuan', 'keranjang_keluar.id AS id',
-            'keranjang_keluar.qty AS qty_barang_keluar'
+            'keranjang_keluar.qty AS qty_barang_keluar', 'keranjang_keluar.subtotal'
         ])
             ->where('keranjang_keluar.id_user', $this->id_user)
             ->join('barang')
@@ -162,7 +162,7 @@ class Cartout extends MY_Controller
      * Fungsi ini memasukan informasi pengeluaran barang ke tabel 'barang_keluar' 
      * dan memindahkan list keranjang keluar ke tabel 'barang_keluar_detail'
      */
-    public function checkout()
+    public function checkout($total)
     {
         if (!isset($this->id_user)) {
             $this->session->set_flashdata('error', 'Akses checkout ditolak!');
@@ -176,10 +176,16 @@ class Cartout extends MY_Controller
         $barangUser = $this->db->get_where('keranjang_keluar',['id_user' => $this->id_user])->result_array();
 
         if($barangUser){
-            $idBarangTerakhir = $this->db->query('SELECT * FROM barang_keluar_detail ORDER BY id DESC LIMIT 1 ')->row_array();
+            $data_keluar = [
+                'id_user' => $this->id_user,
+                'total_harga' =>  $total,
+            ];
+
+            $this->db->insert('barang_keluar', $data_keluar);
+            $idBarangTerakhir = $this->db->query('SELECT * FROM barang_keluar ORDER BY id DESC LIMIT 1 ')->row_array();
             foreach($barangUser as $barang){
                 $data_keluar_detail = [
-                    'id_barang_keluar' => $idBarangTerakhir['id'] + 2,
+                    'id_barang_keluar' => $idBarangTerakhir['id'],
                     'id_barang' => $barang['id_barang'],
                     'qty' => $barang['qty'],
                     'subtotal' => $barang['subtotal'],
@@ -187,19 +193,26 @@ class Cartout extends MY_Controller
 
                 $this->db->insert('barang_keluar_detail', $data_keluar_detail);
 
-                $data_keluar = [
-                    'id_user' => $this->id_user,
-                    'total_harga' =>  $barang['subtotal'],
-                ];
-
-                $this->db->insert('barang_keluar', $data_keluar);
-
                 $this->db->where('id', $id);
                 $this->db->delete('keranjang_keluar');
             }
 
-            $this->session->set_flashdata('success','Data Berhasil Tambahkan');
-            redirect('Cartout');
+            foreach($barangUser as $user){
+                $this->db->where('id_user', $this->id_user);
+                $this->db->delete('keranjang_keluar');
+            }
+
+            $data['title']              = 'Checkout';
+            $data['breadcrumb_title']   = "Checkout";
+            $data['breadcrumb_path']    = 'Barang Masuk / Keranjang Masuk / Checkout';
+            $data['page']               = 'pages/cartout/checkout';
+
+            // Ambil data pemasukan barang untuk ditampilkan di halaman checkout
+            $data['barang_keluar'] = $this->db->get_where('barang_keluar',['id' => $idBarangTerakhir['id']])->row();
+            $data['user'] = $this->db->get_where('user',['id' => $data['barang_keluar']->id_user])->row();
+            $data['list_barang'] = $this->db->get_where('barang_keluar_detail',['id_barang_keluar' => $idBarangTerakhir['id']])->result();
+
+            $this->view($data);
         }else{
             $this->session->set_flashdata('error','Data Tidak Di Temukan');
         }
